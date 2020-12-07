@@ -5,6 +5,8 @@ import com.dc297.ecommerce.orderService.dtos.*;
 import com.dc297.ecommerce.orderService.exceptions.BadRequestException;
 import com.dc297.ecommerce.orderService.exceptions.NotFoundException;
 import com.dc297.ecommerce.orderService.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,9 +25,17 @@ public class OrderService implements IOrderService{
     private final OrderPaymentRepository orderPaymentRepository;
     private final OrderPricingRepository orderPricingRepository;
 
+    private final Logger logger = LoggerFactory.getLogger(OrderService.class.getName());
 
-
-    public OrderService(OrderRepository orderRepository, AddressRepository addressRepository, ItemRepository itemRepository, CustomerRepository customerRepository, PaymentMethodRepository paymentMethodRepository, OrderItemRepository orderItemRepository, OrderAddressRepository orderAddressRepository, OrderPaymentRepository orderPaymentRepository, OrderPricingRepository orderPricingRepository){
+    public OrderService(OrderRepository orderRepository,
+                        AddressRepository addressRepository,
+                        ItemRepository itemRepository,
+                        CustomerRepository customerRepository,
+                        PaymentMethodRepository paymentMethodRepository,
+                        OrderItemRepository orderItemRepository,
+                        OrderAddressRepository orderAddressRepository,
+                        OrderPaymentRepository orderPaymentRepository,
+                        OrderPricingRepository orderPricingRepository) {
         this.orderRepository = orderRepository;
         this.addressRepository = addressRepository;
         this.itemRepository = itemRepository;
@@ -40,16 +50,34 @@ public class OrderService implements IOrderService{
     @Override
     public OrderDto create(OrderDto order) {
         if(order.id != null) throw new BadRequestException();
+        logger.info("Creating order");
+
+        logger.info("Saving order pricing");
         order.pricing = pricingEntityToDto(orderPricingRepository.save(pricingDtoToEntity(order.pricing)));
+        logger.info("Saved order pricing with id {}", order.pricing.id);
+
+        logger.info("Saving order");
         Order savedOrder = orderRepository.save(orderDtoToEntity(order));
-        order.items.stream().forEach(x -> addItemToOrder(x, savedOrder));
-        order.addresses.stream().forEach(x -> addAddressToOrder(x, savedOrder));
-        order.paymentMethods.stream().forEach(x -> addPaymentMethodToOrder(x, savedOrder));
-        return orderEntityToDto(orderRepository.findById(savedOrder.id).orElseThrow(NotFoundException::new));
+        logger.info("Saved order with id {}", savedOrder.id);
+
+        logger.info("Adding items to order");
+        savedOrder.items = order.items.parallelStream().map(x -> addItemToOrder(x, savedOrder)).collect(Collectors.toList());
+        logger.info("Added items order");
+
+        logger.info("Adding addresses to order");
+        savedOrder.addresses = order.addresses.parallelStream().map(x -> addAddressToOrder(x, savedOrder)).collect(Collectors.toList());
+        logger.info("Successfully added addresses to order");
+
+        logger.info("Adding payment methods to order");
+        savedOrder.payments = order.paymentMethods.parallelStream().map(x -> addPaymentMethodToOrder(x, savedOrder)).collect(Collectors.toList());
+        logger.info("Added payment methods to order");
+
+        logger.info("Successfully created order");
+        return orderEntityToDto(savedOrder);
     }
 
-    private void addPaymentMethodToOrder(PaymentMethodDto x, Order savedOrder) {
-        if(x == null || savedOrder == null) return;
+    private OrderPayment addPaymentMethodToOrder(PaymentMethodDto x, Order savedOrder) {
+        if(x == null || savedOrder == null) return null;
         OrderPayment orderPayment = new OrderPayment();
 
         orderPayment.paymentMethod = paymentMethodRepository.findById(x.id).orElseThrow(NotFoundException::new);
@@ -57,29 +85,29 @@ public class OrderService implements IOrderService{
         orderPayment.amount = x.amount;
         orderPayment.confirmationNumber = x.confirmationNumber;
         orderPayment.date = x.date;
-        orderPaymentRepository.save(orderPayment);
+        return orderPaymentRepository.save(orderPayment);
     }
 
-    private void addAddressToOrder(AddressDto x, Order savedOrder) {
-        if(x == null || savedOrder == null) return;
+    private OrderAddress addAddressToOrder(AddressDto x, Order savedOrder) {
+        if(x == null || savedOrder == null) return null;
         OrderAddress orderAddress = new OrderAddress();
 
         orderAddress.order = savedOrder;
         orderAddress.address = addressRepository.findById(x.id).orElseThrow(NotFoundException::new);
         orderAddress.type = x.type;
 
-        orderAddressRepository.save(orderAddress);
+        return orderAddressRepository.save(orderAddress);
     }
 
-    private void addItemToOrder(ItemDto x, Order order) {
-        if(x == null || order == null) return;
+    private OrderItem addItemToOrder(ItemDto x, Order order) {
+        if(x == null || order == null) return null;
         OrderItem orderItem = new OrderItem();
 
         orderItem.order = order;
         orderItem.item = itemRepository.findById(x.id).orElseThrow(NotFoundException::new);
         orderItem.quantity = x.quantity;
 
-        orderItemRepository.save(orderItem);
+        return orderItemRepository.save(orderItem);
     }
 
     @Override
@@ -107,16 +135,27 @@ public class OrderService implements IOrderService{
     private OrderDto orderEntityToDto(Order order){
         if(order == null) return null;
 
+        logger.info("Converting order entity to dto");
+
         OrderDto output = new OrderDto();
         output.id = order.id;
         output.status = order.status;
         output.shippingMethod = order.shippingMethod;
         output.shippingMethodNotes = order.shippingMethodNotes;
 
-        output.addresses = order.addresses.stream().map(x -> addressEntityToDto(x)).collect(Collectors.toList());
+        logger.info("Converting order customer entity to dto {}", order.customer);
         output.customer = customerEntityToDto(order.customer);
+
+        logger.info("Converting order items entity to dto {}", order.items);
         output.items = order.items.stream().map(x -> itemEntityToDto(x)).collect(Collectors.toList());
+
+        logger.info("Converting order addresses entity to dto {}", order.addresses);
+        output.addresses = order.addresses.stream().map(x -> addressEntityToDto(x)).collect(Collectors.toList());
+
+        logger.info("Converting order payment methods entity to dto {}", order.payments);
         output.paymentMethods = order.payments.stream().map(x -> paymentMethodEntityToDto(x)).collect(Collectors.toList());
+
+        logger.info("Converting order pricing entity to dto {}", order.pricing);
         output.pricing = pricingEntityToDto(order.pricing);
         return output;
     }
@@ -174,6 +213,7 @@ public class OrderService implements IOrderService{
         output.line2 = addressInput.address.line2;
         output.zip = addressInput.address.zip;
         output.state = addressInput.address.state;
+        output.type = addressInput.type;
         return output;
     }
 

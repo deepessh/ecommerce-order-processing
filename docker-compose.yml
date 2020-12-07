@@ -20,8 +20,11 @@ services:
             SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/testdb
             SPRING_DATASOURCE_USERNAME: postgres
             SPRING_DATASOURCE_PASSWORD: admin
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+            KAFKA_TOPIC_ORDER: order_batch
         depends_on:
         - "db"
+        - "kafka"
     pgadmin:
         image: dpage/pgadmin4:4.18
         restart: always
@@ -33,6 +36,25 @@ services:
         - "5000:80"
         volumes:
         - pgadmin-data:/var/lib/pgadmin
+    kafka:
+        image: spotify/kafka
+        ports:
+        - "2181:2181"
+        - "9092:9092"
+        hostname: kafka
+        container_name: kafka
+        environment:
+        - "ADVERTISED_HOST=kafka"
+        - "ADVERTISED_PORT=9092"
+        - "AUTO_CREATE_TOPICS=true"
+        command: >
+            bash -c
+            "(sleep 15s &&
+            /opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh
+            --create
+            --zookeeper
+            localhost:2181 --replication-factor 1 --partitions 1
+            --topic order_batch &) && (supervisord -n)"
 volumes:
     postgres-data:
     pgadmin-data:

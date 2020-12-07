@@ -23,16 +23,16 @@ public class Order {
     @ManyToOne
     public Customer customer;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     public List<OrderItem> items;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     public List<OrderAddress> addresses;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     public List<OrderPayment> payments;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "pricing_id")
     public OrderPricing pricing;
 }
