@@ -38,8 +38,14 @@ public class OrderService implements IOrderService{
     @Override
     public void cancel(UUID id) {
         logger.info("Cancel order by id {}", id);
+        updateStatus(id, 5);
+    }
+
+    @Override
+    public void updateStatus(UUID id, int status) {
+        logger.info("Update order status with id {} to status {}", id, status);
         Order order = orderRepository.findById(id).orElseThrow(NotFoundException::new);
-        order.status = 5;
+        order.status = status;
         orderRepository.save(order);
     }
 

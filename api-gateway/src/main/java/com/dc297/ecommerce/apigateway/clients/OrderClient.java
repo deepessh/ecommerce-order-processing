@@ -19,4 +19,8 @@ public interface OrderClient {
     @GetMapping("/orders/{orderId}")
     @CrossOrigin
     OrderDto get(@PathVariable UUID orderId);
+
+    @PutMapping("/orders/{orderId}/status")
+    @CrossOrigin
+    void updateStatus(@PathVariable UUID orderId, @RequestBody int status);
 }

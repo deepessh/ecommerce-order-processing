@@ -62,6 +62,11 @@ public class OrderService implements IOrderService {
         orderClient.cancel(id);
     }
 
+    @Override
+    public void updateStatus(UUID orderId, int status) {
+        orderClient.updateStatus(orderId, status);
+    }
+
     private ItemDto addItemToOrder(ItemDto itemDto, UUID orderId){
         return itemClient.addItemToOrder(itemDto, orderId);
     }

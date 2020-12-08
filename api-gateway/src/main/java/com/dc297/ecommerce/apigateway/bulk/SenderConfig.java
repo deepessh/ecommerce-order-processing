@@ -1,6 +1,7 @@
 package com.dc297.ecommerce.apigateway.bulk;
 
 import com.dc297.ecommerce.apigateway.dtos.OrderDto;
+import com.dc297.ecommerce.apigateway.dtos.OrderStatusDto;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,12 +32,16 @@ public class SenderConfig {
     }
 
     @Bean
-    public ProducerFactory<String, OrderDto> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs());
-    }
+    public ProducerFactory<String, OrderDto> producerFactory() { return new DefaultKafkaProducerFactory<>(producerConfigs()); }
 
     @Bean
     public KafkaTemplate<String, OrderDto> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
+
+    @Bean
+    public ProducerFactory<String, OrderStatusDto> producerFactoryOrderStatus() { return new DefaultKafkaProducerFactory<>(producerConfigs()); }
+
+    @Bean
+    public KafkaTemplate<String, OrderStatusDto> kafkaTemplateStatus() { return new KafkaTemplate<>(producerFactoryOrderStatus()); }
 }

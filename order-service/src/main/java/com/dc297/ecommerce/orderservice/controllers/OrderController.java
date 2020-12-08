@@ -45,4 +45,10 @@ public class OrderController {
         LOGGER.info("Received request to cancel order");
         orderService.cancel(id);
     }
+
+    @PutMapping("/{id}/status")
+    public void putStatus(@PathVariable UUID id, @RequestBody int status){
+        LOGGER.info("Received request to update status id {} status {} ", id, status);
+        orderService.updateStatus(id, status);
+    }
 }

@@ -32,4 +32,10 @@ public class OrderController {
     public OrderDto getOrder(@PathVariable UUID orderId){
         return orderService.getOrderById(orderId);
     }
+
+    @PutMapping("/orders/{orderId}/status")
+    @CrossOrigin
+    public void updateStatus(@PathVariable UUID orderId, @RequestBody int status){
+        orderService.updateStatus(orderId, status);
+    }
 }

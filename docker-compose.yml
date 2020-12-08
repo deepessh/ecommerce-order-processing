@@ -86,6 +86,7 @@ services:
             SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka/
             SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
             KAFKA_TOPIC_ORDER: order_batch
+            KAFKA_TOPIC_ORDERSTATUS: order_batch_status
         depends_on:
             - "db"
             - "kafka"
@@ -119,7 +120,12 @@ services:
             --create
             --zookeeper
             localhost:2181 --replication-factor 1 --partitions 1
-            --topic order_batch &) && (supervisord -n)"
+            --topic order_batch &) && 
+            (/opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh
+            --create
+            --zookeeper
+            localhost:2181 --replication-factor 1 --partitions 1
+            --topic order_batch_status &) && (supervisord -n)"
 volumes:
     postgres-data:
     pgadmin-data:

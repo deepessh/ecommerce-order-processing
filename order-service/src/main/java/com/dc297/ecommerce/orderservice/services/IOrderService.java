@@ -8,4 +8,5 @@ public interface IOrderService {
     OrderDto create(OrderDto order);
     OrderDto getById(UUID id);
     void cancel(UUID id);
+    void updateStatus(UUID id, int status);
 }
