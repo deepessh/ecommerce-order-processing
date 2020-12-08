@@ -3,6 +3,7 @@ package com.dc297.ecommerce.addressservice.services;
 import com.dc297.ecommerce.addressservice.dtos.AddressDto;
 import com.dc297.ecommerce.addressservice.entities.OrderAddress;
 import com.dc297.ecommerce.addressservice.exceptions.InternalServerException;
+import com.dc297.ecommerce.addressservice.exceptions.NotFoundException;
 import com.dc297.ecommerce.addressservice.repositories.AddressRepository;
 import com.dc297.ecommerce.addressservice.repositories.OrderAddressRepository;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class AddressService implements IAddressService{
         OrderAddress orderAddress = new OrderAddress();
 
         orderAddress.orderId = orderId;
-        orderAddress.address = addressRepository.findById(x.id).orElseThrow(InternalServerException::new);
+        orderAddress.address = addressRepository.findById(x.id).orElseThrow(NotFoundException::new);
         orderAddress.type = x.type;
 
         return addressEntityToDto(orderAddressRepository.save(orderAddress));

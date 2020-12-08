@@ -9,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderService implements IOrderService{
@@ -32,19 +30,9 @@ public class OrderService implements IOrderService{
     }
 
     @Override
-    public List<OrderDto> findAll() {
-        return orderRepository.findAll().stream().map(this::orderEntityToDto).collect(Collectors.toList());
-    }
-
-    @Override
     public OrderDto getById(UUID id) {
         logger.info("Getting order by id {}", id);
         return orderEntityToDto(orderRepository.findById(id).orElseThrow(NotFoundException::new));
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        orderRepository.deleteById(id);
     }
 
     @Override
