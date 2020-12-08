@@ -1,6 +1,6 @@
-package com.dc297.ecommerce.orderservice.bulk;
+package com.dc297.ecommerce.apigateway.bulk;
 
-import com.dc297.ecommerce.orderservice.dtos.OrderDto;
+import com.dc297.ecommerce.apigateway.dtos.OrderDto;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;

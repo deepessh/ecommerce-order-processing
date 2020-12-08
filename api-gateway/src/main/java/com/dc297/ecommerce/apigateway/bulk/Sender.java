@@ -1,6 +1,6 @@
-package com.dc297.ecommerce.orderservice.bulk;
+package com.dc297.ecommerce.apigateway.bulk;
 
-import com.dc297.ecommerce.orderservice.dtos.OrderDto;
+import com.dc297.ecommerce.apigateway.dtos.OrderDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

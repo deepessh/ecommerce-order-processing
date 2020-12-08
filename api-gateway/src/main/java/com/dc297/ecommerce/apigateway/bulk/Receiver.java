@@ -1,7 +1,7 @@
-package com.dc297.ecommerce.orderservice.bulk;
+package com.dc297.ecommerce.apigateway.bulk;
 
-import com.dc297.ecommerce.orderservice.dtos.OrderDto;
-import com.dc297.ecommerce.orderservice.services.IOrderService;
+import com.dc297.ecommerce.apigateway.dtos.OrderDto;
+import com.dc297.ecommerce.apigateway.services.IOrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
