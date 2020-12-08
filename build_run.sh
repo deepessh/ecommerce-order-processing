@@ -1,4 +1,4 @@
-cd orderService
+cd order-service
 chmod +x mvnw
 ./mvnw package
 

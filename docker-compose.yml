@@ -12,8 +12,8 @@ services:
             - POSTGRES_DB=testdb
         restart: unless-stopped
 
-    order_service:
-        build: orderService/.
+    order-service:
+        build: order-service/.
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/testdb
             SPRING_DATASOURCE_USERNAME: postgres
