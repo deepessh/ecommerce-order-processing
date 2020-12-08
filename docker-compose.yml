@@ -14,17 +14,82 @@ services:
 
     order_service:
         build: orderService/.
-        ports: 
-        - "8080:8080"
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/testdb
             SPRING_DATASOURCE_USERNAME: postgres
             SPRING_DATASOURCE_PASSWORD: admin
             SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
             KAFKA_TOPIC_ORDER: order_batch
+            SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka/
         depends_on:
         - "db"
         - "kafka"
+        - "discovery-service"
+    discovery-service:
+        build: discovery-service/.
+        ports: 
+        - "8761:8761"
+        environment:
+            SERVER_PORT: 8761
+    item-service:
+        build: item-service/.
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/testdb
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: admin
+            SERVER_PORT: 8080
+            SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+        depends_on:
+            - "db"
+            - "kafka"
+            - "discovery-service"
+    customer-service:
+        build: customer-service/.
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/testdb
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: admin
+            SERVER_PORT: 8080
+            SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+        depends_on:
+            - "db"
+            - "kafka"
+            - "discovery-service"
+    address-service:
+        build: address-service/.
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/testdb
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: admin
+            SERVER_PORT: 8080
+            SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+        depends_on:
+            - "db"
+            - "kafka"
+            - "discovery-service"
+    payment-method-service:
+        build: payment-method-service/.
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/testdb
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: admin
+            SERVER_PORT: 8080
+            SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+        depends_on:
+            - "db"
+            - "kafka"
+            - "discovery-service"
+    api-gateway:
+        build: api-gateway/.
+        ports: 
+            - "8080:8080"
+        environment:
+            SERVER_PORT: 8080
+            SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+        depends_on:
+            - "db"
+            - "kafka"
+            - "discovery-service"
     pgadmin:
         image: dpage/pgadmin4:4.18
         restart: always

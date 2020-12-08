@@ -1,6 +1,5 @@
 package com.dc297.ecommerce.orderService.services;
 
-import com.dc297.ecommerce.entities.Order;
 import com.dc297.ecommerce.orderService.dtos.OrderDto;
 
 import java.util.List;

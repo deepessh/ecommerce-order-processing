@@ -1,7 +1,6 @@
 package com.dc297.ecommerce.entities;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -23,16 +22,15 @@ public class Order {
     @ManyToOne
     public Customer customer;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
-    public List<OrderItem> items;
+    @Column
+    public double subtotal;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
-    public List<OrderAddress> addresses;
+    @Column
+    public double tax;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
-    public List<OrderPayment> payments;
+    @Column(name="shipping_charges")
+    public double shippingCharges;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "pricing_id")
-    public OrderPricing pricing;
+    @Column
+    public double total;
 }
