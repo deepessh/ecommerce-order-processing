@@ -21,3 +21,15 @@ All the micro-services are dockerized and deployable to docker using docker-comp
 
 1. execute build_run.sh
 
+## Improvements
+
+1. Logging and metrics can be improved, can use ELK stack to ingest logs and generate metrics
+2. Async communication among microservices. Instead of communicating via Http, the microservices can send messages to each other.
+3. Unit testing can be improved
+4. Integration tests can be added
+5. Batch processing servers should be different from normal API servers
+6. 
+
+## Bugs
+
+1. Updating bulk status removes items, addresses, payment methods
